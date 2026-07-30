@@ -37,7 +37,8 @@ TEXT_HIDDEN = 768
 ACTION_DIM = 7
 ACTION_HORIZON = 12
 WARMUP_STEPS = 12
-TIMED_STEPS = 1_000_000
+MODEL_TIMED_STEPS = 1_000_000
+WALL_TIMED_STEPS = 100_000
 PROGRESS_INTERVAL = 10_000
 
 
@@ -206,7 +207,7 @@ def worker(args: argparse.Namespace) -> int:
     start_event = torch.cuda.Event(enable_timing=True)
     end_event = torch.cuda.Event(enable_timing=True)
     phase_started = time.perf_counter()
-    for step in range(1, TIMED_STEPS + 1):
+    for step in range(1, MODEL_TIMED_STEPS + 1):
         start_event.record()
         output = forward_only()
         end_event.record()
@@ -222,7 +223,7 @@ def worker(args: argparse.Namespace) -> int:
                         "global_index": int(args.global_index),
                         "phase": "cuda_model",
                         "running_mean_ms": statistics.fmean(cuda_times),
-                        "target": TIMED_STEPS,
+                        "target": MODEL_TIMED_STEPS,
                     },
                     sort_keys=True,
                 ),
@@ -231,7 +232,7 @@ def worker(args: argparse.Namespace) -> int:
 
     wall_times = []
     phase_started = time.perf_counter()
-    for step in range(1, TIMED_STEPS + 1):
+    for step in range(1, WALL_TIMED_STEPS + 1):
         torch.cuda.synchronize()
         started = time.perf_counter()
         pixels = ((cpu_images_u8.float() / 255.0 - mean) / std).to(
@@ -253,7 +254,7 @@ def worker(args: argparse.Namespace) -> int:
                         "global_index": int(args.global_index),
                         "phase": "end_to_end_policy",
                         "running_mean_ms": statistics.fmean(wall_times),
-                        "target": TIMED_STEPS,
+                        "target": WALL_TIMED_STEPS,
                     },
                     sort_keys=True,
                 ),
