@@ -37,6 +37,7 @@ TEXT_TOKENS = 32
 TEXT_HIDDEN = 768
 ACTION_DIM = 7
 ACTION_HORIZON = 12
+INTERACTION_LAYERS = 2
 WARMUP_STEPS = 12
 TIMED_STEPS = 80
 
@@ -104,7 +105,7 @@ def construct_model(model_spec: dict):
         dim_feedforward=2048,
         enhancer_inner_dim=1024,
         max_text_len=256,
-        vla_feature_enhancer_layers=6,
+        vla_feature_enhancer_layers=INTERACTION_LAYERS,
         state_dim=8,
         num_state_tokens=2,
         text_dropout=0.0,
@@ -250,6 +251,7 @@ def worker(args: argparse.Namespace) -> int:
         "trainable_parameter_count_before_eval_freeze": int(trainable_parameter_count),
         "input_shape": [1, NUM_VIEWS, 3, IMAGE_SIZE, IMAGE_SIZE],
         "text_tokens": TEXT_TOKENS,
+        "interaction_layers": INTERACTION_LAYERS,
         "output_shape": list(output.shape),
         "output_finite": bool(torch.isfinite(output).all().item()),
         "determinism_max_abs": determinism_max_abs,
