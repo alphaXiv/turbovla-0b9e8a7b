@@ -36,7 +36,7 @@ NUM_VIEWS = 2
 TEXT_TOKENS = 32
 TEXT_HIDDEN = 768
 ACTION_DIM = 7
-ACTION_HORIZON = 12
+ACTION_HORIZON = 8
 WARMUP_STEPS = 12
 TIMED_STEPS = 80
 
@@ -250,6 +250,7 @@ def worker(args: argparse.Namespace) -> int:
         "trainable_parameter_count_before_eval_freeze": int(trainable_parameter_count),
         "input_shape": [1, NUM_VIEWS, 3, IMAGE_SIZE, IMAGE_SIZE],
         "text_tokens": TEXT_TOKENS,
+        "action_horizon": ACTION_HORIZON,
         "output_shape": list(output.shape),
         "output_finite": bool(torch.isfinite(output).all().item()),
         "determinism_max_abs": determinism_max_abs,
@@ -377,8 +378,9 @@ def launch_workers(args: argparse.Namespace) -> int:
             0.15 <= result["paper_total_parameters_billion"] <= 0.25
             for result in results
         ),
-        "output_shape_1x12x7": all(
-            result["output_shape"] == [1, 12, 7] for result in results
+        "output_shape_expected": all(
+            result["output_shape"] == [1, ACTION_HORIZON, ACTION_DIM]
+            for result in results
         ),
         "outputs_finite": all(result["output_finite"] for result in results),
         "deterministic_eval": all(
