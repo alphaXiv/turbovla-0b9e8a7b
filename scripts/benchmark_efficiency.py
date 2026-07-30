@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Distributed synthetic-input efficiency reproduction for released TurboVLA.
 
-Each Indexed Job pod owns eight GPUs. The pod launcher starts one isolated
-worker per visible GPU, and index zero aggregates every worker result from the
-shared volume into the terminal log consumed by ``orx logs``.
+Each Indexed Job pod owns one GPU. Index zero aggregates every worker result
+from the shared volume into the terminal log consumed by ``orx logs``.
 """
 
 from __future__ import annotations
@@ -39,7 +38,8 @@ ACTION_DIM = 7
 ACTION_HORIZON = 12
 INTERACTION_LAYERS = 2
 WARMUP_STEPS = 12
-TIMED_STEPS = 80
+TIMED_STEPS = 600_000
+PROGRESS_INTERVAL = 10_000
 
 
 def parse_args() -> argparse.Namespace:
@@ -206,15 +206,33 @@ def worker(args: argparse.Namespace) -> int:
     cuda_times = []
     start_event = torch.cuda.Event(enable_timing=True)
     end_event = torch.cuda.Event(enable_timing=True)
-    for _ in range(TIMED_STEPS):
+    phase_started = time.perf_counter()
+    for step in range(1, TIMED_STEPS + 1):
         start_event.record()
         output = forward_only()
         end_event.record()
         end_event.synchronize()
         cuda_times.append(float(start_event.elapsed_time(end_event)))
+        if step % PROGRESS_INTERVAL == 0:
+            print(
+                "TURBOVLA_PROGRESS "
+                + json.dumps(
+                    {
+                        "completed": step,
+                        "elapsed_s": time.perf_counter() - phase_started,
+                        "global_index": int(args.global_index),
+                        "phase": "cuda_model",
+                        "running_mean_ms": statistics.fmean(cuda_times),
+                        "target": TIMED_STEPS,
+                    },
+                    sort_keys=True,
+                ),
+                flush=True,
+            )
 
     wall_times = []
-    for _ in range(TIMED_STEPS):
+    phase_started = time.perf_counter()
+    for step in range(1, TIMED_STEPS + 1):
         torch.cuda.synchronize()
         started = time.perf_counter()
         pixels = ((cpu_images_u8.float() / 255.0 - mean) / std).to(
@@ -226,6 +244,22 @@ def worker(args: argparse.Namespace) -> int:
         policy_output.float().cpu()
         torch.cuda.synchronize()
         wall_times.append((time.perf_counter() - started) * 1000.0)
+        if step % PROGRESS_INTERVAL == 0:
+            print(
+                "TURBOVLA_PROGRESS "
+                + json.dumps(
+                    {
+                        "completed": step,
+                        "elapsed_s": time.perf_counter() - phase_started,
+                        "global_index": int(args.global_index),
+                        "phase": "end_to_end_policy",
+                        "running_mean_ms": statistics.fmean(wall_times),
+                        "target": TIMED_STEPS,
+                    },
+                    sort_keys=True,
+                ),
+                flush=True,
+            )
 
     allocated_peak = torch.cuda.max_memory_allocated() / (1024**3)
     reserved_peak = torch.cuda.max_memory_reserved() / (1024**3)
