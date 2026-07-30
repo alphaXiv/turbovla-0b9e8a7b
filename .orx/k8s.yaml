@@ -17,8 +17,8 @@ metadata:
   labels:
     app: turbovla-efficiency
 spec:
-  completions: 16
-  parallelism: 16
+  completions: 8
+  parallelism: 8
   completionMode: Indexed
   backoffLimit: 0
   activeDeadlineSeconds: 36000
@@ -41,7 +41,7 @@ spec:
             - name: TURBOVLA_RESULTS_DIR
               value: /orx-results
             - name: TURBOVLA_EXPECTED_PODS
-              value: "16"
+              value: "8"
             - name: TURBOVLA_EXPECTED_GPUS_PER_POD
               value: "1"
           resources:
