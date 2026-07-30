@@ -31,7 +31,7 @@ PAPER = {
 # in the online policy process, but the paper's 0.2B "total parameters" count
 # includes the modality encoder while its sub-1GB deployment uses cached text.
 BERT_BASE_PARAMETER_COUNT = 109_482_240
-IMAGE_SIZE = 256
+IMAGE_SIZE = 224
 NUM_VIEWS = 2
 TEXT_TOKENS = 32
 TEXT_HIDDEN = 768
