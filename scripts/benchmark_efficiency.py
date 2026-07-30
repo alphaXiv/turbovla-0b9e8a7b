@@ -33,7 +33,7 @@ PAPER = {
 BERT_BASE_PARAMETER_COUNT = 109_482_240
 IMAGE_SIZE = 256
 NUM_VIEWS = 2
-TEXT_TOKENS = 16
+TEXT_TOKENS = 32
 TEXT_HIDDEN = 768
 ACTION_DIM = 7
 ACTION_HORIZON = 12
@@ -372,7 +372,7 @@ def launch_workers(args: argparse.Namespace) -> int:
 
     validations = {
         "all_workers_ok": all(result["status"] == "ok" for result in results),
-        "replicate_count_16": len(results) == 16,
+        "replicate_count_expected": len(results) == expected_workers,
         "parameter_count_near_paper_0p2b": all(
             0.15 <= result["paper_total_parameters_billion"] <= 0.25
             for result in results
