@@ -17,8 +17,8 @@ metadata:
   labels:
     app: turbovla-efficiency
 spec:
-  completions: 2
-  parallelism: 2
+  completions: 16
+  parallelism: 16
   completionMode: Indexed
   backoffLimit: 0
   activeDeadlineSeconds: 36000
@@ -41,18 +41,20 @@ spec:
             - name: TURBOVLA_RESULTS_DIR
               value: /orx-results
             - name: TURBOVLA_EXPECTED_PODS
-              value: "2"
+              value: "16"
+            - name: TURBOVLA_EXPECTED_GPUS_PER_POD
+              value: "1"
           resources:
             requests:
-              nvidia.com/gpu: "8"
-              cpu: "64"
-              memory: 256Gi
-              ephemeral-storage: 40Gi
+              nvidia.com/gpu: "1"
+              cpu: "8"
+              memory: 32Gi
+              ephemeral-storage: 10Gi
             limits:
-              nvidia.com/gpu: "8"
-              cpu: "96"
-              memory: 512Gi
-              ephemeral-storage: 80Gi
+              nvidia.com/gpu: "1"
+              cpu: "16"
+              memory: 64Gi
+              ephemeral-storage: 20Gi
           volumeMounts:
             - name: results
               mountPath: /orx-results

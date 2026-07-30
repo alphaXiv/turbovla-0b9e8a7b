@@ -280,8 +280,11 @@ def launch_workers(args: argparse.Namespace) -> int:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     gpu_count = torch.cuda.device_count()
-    if gpu_count != 8:
-        raise RuntimeError(f"pod expected 8 visible GPUs, got {gpu_count}")
+    expected_gpus = int(os.environ.get("TURBOVLA_EXPECTED_GPUS_PER_POD", "8"))
+    if gpu_count != expected_gpus:
+        raise RuntimeError(
+            f"pod expected {expected_gpus} visible GPUs, got {gpu_count}"
+        )
     processes = []
     for local_gpu in range(gpu_count):
         global_index = args.pod_index * gpu_count + local_gpu
