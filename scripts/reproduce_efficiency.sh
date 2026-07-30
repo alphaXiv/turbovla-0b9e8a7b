@@ -22,16 +22,21 @@ python -m pip install --quiet --no-cache-dir \
   "Pillow>=10" \
   "numpy>=1.26,<2" \
   "nvidia-ml-py>=12"
+python -m pip install --quiet --no-deps -e .
 
 python - <<'PY'
 import torch
 import transformers
+import turbovla
+from transformers import DINOv3ViTConfig, DINOv3ViTModel
 
 print(
     "TURBOVLA_ENV "
     f"torch={torch.__version__} cuda={torch.version.cuda} "
     f"transformers={transformers.__version__} "
-    f"cuda_available={torch.cuda.is_available()} gpu_count={torch.cuda.device_count()}"
+    f"cuda_available={torch.cuda.is_available()} gpu_count={torch.cuda.device_count()} "
+    f"package_import={turbovla.__name__} "
+    f"dinov3_classes={DINOv3ViTConfig.__name__},{DINOv3ViTModel.__name__}"
 )
 if not torch.cuda.is_available():
     raise SystemExit("CUDA is required for the efficiency reproduction")
