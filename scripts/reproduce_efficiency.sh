@@ -10,7 +10,6 @@ export TOKENIZERS_PARALLELISM=false
 pod_index="${JOB_COMPLETION_INDEX:-0}"
 expected_pods="${TURBOVLA_EXPECTED_PODS:-1}"
 run_dir="${TURBOVLA_RESULTS_DIR}/efficiency"
-model_dir="${TURBOVLA_RESULTS_DIR}/dinov3-vitb16"
 model_spec="${TURBOVLA_RESULTS_DIR}/model_spec.json"
 
 mkdir -p "${run_dir}" "${HF_HOME}"
@@ -39,37 +38,22 @@ if not torch.cuda.is_available():
 PY
 
 if [[ "${pod_index}" == "0" ]]; then
-  rm -f "${model_spec}.tmp"
-  MODEL_DIR="${model_dir}" MODEL_SPEC="${model_spec}" python - <<'PY'
+  MODEL_SPEC="${model_spec}" python - <<'PY'
 import json
 import os
 from pathlib import Path
 
 model_id = "facebook/dinov3-vitb16-pretrain-lvd1689m"
-model_dir = Path(os.environ["MODEL_DIR"])
 spec_path = Path(os.environ["MODEL_SPEC"])
 payload = {
     "model_id": model_id,
-    "model_path": str(model_dir),
-    "weights_source": "released_pretrained",
+    "model_path": "not-used",
+    "weights_source": "shape_faithful_random",
+    "reason": (
+        "The released checkpoint is gated for this runtime identity. "
+        "Weights do not affect architecture-level latency, allocation, or parameter count."
+    ),
 }
-try:
-    from huggingface_hub import snapshot_download
-
-    snapshot_download(
-        repo_id=model_id,
-        local_dir=model_dir,
-        allow_patterns=[
-            "*.json",
-            "*.safetensors",
-            "*.bin",
-            "*.txt",
-            "*.model",
-        ],
-    )
-except Exception as exc:
-    payload["weights_source"] = "shape_faithful_random_fallback"
-    payload["download_error"] = f"{type(exc).__name__}: {exc}"
 tmp = spec_path.with_suffix(".tmp")
 tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 tmp.replace(spec_path)

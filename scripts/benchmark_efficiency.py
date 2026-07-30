@@ -154,7 +154,8 @@ def worker(args: argparse.Namespace) -> int:
 
     device = torch.device("cuda:0")
     model_spec = json.loads(args.model_spec.read_text(encoding="utf-8"))
-    torch.cuda.reset_peak_memory_stats(device)
+    torch.cuda.set_device(0)
+    torch.cuda.reset_peak_memory_stats()
     model = construct_model(model_spec)
     parameter_count = sum(parameter.numel() for parameter in model.parameters())
     paper_total_parameter_count = parameter_count + BERT_BASE_PARAMETER_COUNT
@@ -192,11 +193,11 @@ def worker(args: argparse.Namespace) -> int:
 
     for _ in range(WARMUP_STEPS):
         output = forward_only()
-    torch.cuda.synchronize(device)
+    torch.cuda.synchronize()
 
     reference = output.detach().float().cpu()
     repeated = forward_only()
-    torch.cuda.synchronize(device)
+    torch.cuda.synchronize()
     determinism_max_abs = float(
         (reference - repeated.detach().float().cpu()).abs().max().item()
     )
@@ -213,7 +214,7 @@ def worker(args: argparse.Namespace) -> int:
 
     wall_times = []
     for _ in range(TIMED_STEPS):
-        torch.cuda.synchronize(device)
+        torch.cuda.synchronize()
         started = time.perf_counter()
         pixels = ((cpu_images_u8.float() / 255.0 - mean) / std).to(
             device=device, dtype=torch.bfloat16
@@ -222,13 +223,13 @@ def worker(args: argparse.Namespace) -> int:
         with torch.inference_mode():
             policy_output = model(cpu_text, {"dinov3": pixels}, state)
         policy_output.float().cpu()
-        torch.cuda.synchronize(device)
+        torch.cuda.synchronize()
         wall_times.append((time.perf_counter() - started) * 1000.0)
 
-    allocated_peak = torch.cuda.max_memory_allocated(device) / (1024**3)
-    reserved_peak = torch.cuda.max_memory_reserved(device) / (1024**3)
-    allocated_steady = torch.cuda.memory_allocated(device) / (1024**3)
-    reserved_steady = torch.cuda.memory_reserved(device) / (1024**3)
+    allocated_peak = torch.cuda.max_memory_allocated() / (1024**3)
+    reserved_peak = torch.cuda.max_memory_reserved() / (1024**3)
+    allocated_steady = torch.cuda.memory_allocated() / (1024**3)
+    reserved_steady = torch.cuda.memory_reserved() / (1024**3)
     process_mib = process_gpu_memory_mib()
 
     result = {
@@ -236,8 +237,8 @@ def worker(args: argparse.Namespace) -> int:
         "global_index": int(args.global_index),
         "pod_index": int(args.pod_index),
         "local_gpu": int(args.local_gpu),
-        "gpu_name": torch.cuda.get_device_name(device),
-        "gpu_capability": list(torch.cuda.get_device_capability(device)),
+        "gpu_name": torch.cuda.get_device_name(0),
+        "gpu_capability": list(torch.cuda.get_device_capability(0)),
         "torch_version": torch.__version__,
         "cuda_version": torch.version.cuda,
         "weights_source": model_spec["weights_source"],
