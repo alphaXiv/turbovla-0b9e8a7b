@@ -90,7 +90,7 @@ def process_gpu_memory_mib() -> float | None:
 
 def construct_model(model_spec: dict):
     import torch
-    from transformers import Dinov3ViTConfig, Dinov3ViTModel
+    from transformers import DINOv3ViTConfig, DINOv3ViTModel
 
     from turbovla.models.turbovla import GroundingDINOVLA
     from turbovla.models import turbovla as turbovla_module
@@ -119,7 +119,7 @@ def construct_model(model_spec: dict):
     # ViT-B/16 with four register tokens + CLS matches the released DINOv3
     # token geometry and parameterization. Random weights are sufficient for
     # latency, allocation, and parameter-count measurements.
-    config = Dinov3ViTConfig(
+    config = DINOv3ViTConfig(
         image_size=IMAGE_SIZE,
         patch_size=16,
         num_channels=3,
@@ -130,7 +130,7 @@ def construct_model(model_spec: dict):
         num_register_tokens=4,
         use_mask_token=False,
     )
-    backbone = Dinov3ViTModel(config)
+    backbone = DINOv3ViTModel(config)
     with mock.patch.object(
         turbovla_module.AutoModel,
         "from_pretrained",
