@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "paperId": "2607.27205",
+  "title": "TurboVLA architecture-level efficiency reproduction",
+  "description": "TurboVLA exceeded 32 Hz and matched the reported memory scale on RTX PRO 6000 Blackwell GPUs, while learned-policy success remained untested.",
+  "verdict": "partially-reproduced",
+  "reportPath": "reproduction/report.md",
+  "notebookPath": "reproduction/notebook.py",
+  "compute": {
+    "backend": "kubernetes",
+    "gpuModel": "NVIDIA RTX PRO 6000 Blackwell",
+    "gpuCount": 16,
+    "wallHours": 11.479097
+  }
+}

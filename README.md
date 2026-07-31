@@ -15,6 +15,17 @@
 
 This repository contains the official implementation of **TurboVLA** for the paper **TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with &lt;1 GB VRAM**.
 
+## 🔬 Independent reproduction
+
+The architecture-level efficiency reproduction is **partially reproduced** on
+NVIDIA RTX PRO 6000 Blackwell GPUs. It verifies the model's real-time
+throughput and memory scale; learned-policy task success and the paper's exact
+RTX 4090 result remain outside the available evidence.
+
+- [Polished reproduction report](reproduction/report.md)
+- [Self-contained marimo notebook](reproduction/notebook.py)
+- [Open the notebook in Molab](https://molab.marimo.io/github/alphaXiv/turbovla-0b9e8a7b/blob/main/reproduction/notebook.py)
+
 <div align="center">
   <img src="assets/figures/real-world-tasks.gif" alt="TurboVLA real-world tasks with synchronous inference" width="100%">
   <br>

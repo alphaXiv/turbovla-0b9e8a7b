@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="400" viewBox="0 0 820 400">
+  <rect width="820" height="400" fill="#ffffff"/>
+  <text x="410" y="28" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="bold">Short and sustained CUDA latency agree</text>
+  <text x="410" y="49" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555">Points are eight-replica medians; lines join matched configurations</text>
+  <g stroke="#e5e7eb" stroke-width="1">
+    <line x1="95" y1="315" x2="760" y2="315"/>
+    <line x1="95" y1="253" x2="760" y2="253"/>
+    <line x1="95" y1="191" x2="760" y2="191"/>
+    <line x1="95" y1="129" x2="760" y2="129"/>
+    <line x1="95" y1="67" x2="760" y2="67"/>
+  </g>
+  <line x1="95" y1="315" x2="760" y2="315" stroke="#333" stroke-width="1.5"/>
+  <line x1="95" y1="67" x2="95" y2="315" stroke="#333" stroke-width="1.5"/>
+  <g font-family="sans-serif" font-size="12" fill="#444">
+    <text x="80" y="319" text-anchor="end">9</text>
+    <text x="80" y="257" text-anchor="end">10</text>
+    <text x="80" y="195" text-anchor="end">11</text>
+    <text x="80" y="133" text-anchor="end">12</text>
+    <text x="80" y="71" text-anchor="end">13</text>
+    <text x="275" y="337" text-anchor="middle">Short control</text>
+    <text x="580" y="337" text-anchor="middle">Sustained run</text>
+    <text x="20" y="190" text-anchor="middle" transform="rotate(-90 20 190)">Median CUDA model latency (ms)</text>
+  </g>
+  <g fill="none" stroke-width="3">
+    <line x1="275" y1="108" x2="580" y2="107" stroke="#2563eb"/>
+    <line x1="275" y1="227" x2="580" y2="243" stroke="#059669"/>
+    <line x1="275" y1="65" x2="580" y2="93" stroke="#7c3aed"/>
+  </g>
+  <g stroke="#fff" stroke-width="2">
+    <circle cx="275" cy="108" r="7" fill="#2563eb"/><circle cx="580" cy="107" r="7" fill="#2563eb"/>
+    <circle cx="275" cy="227" r="7" fill="#059669"/><circle cx="580" cy="243" r="7" fill="#059669"/>
+    <circle cx="275" cy="65" r="7" fill="#7c3aed"/><circle cx="580" cy="93" r="7" fill="#7c3aed"/>
+  </g>
+  <g font-family="sans-serif" font-size="11" font-weight="bold">
+    <text x="255" y="100" text-anchor="end" fill="#1e3a8a">N6/256 12.342</text>
+    <text x="600" y="101" fill="#1e3a8a">12.349</text>
+    <text x="255" y="221" text-anchor="end" fill="#065f46">N2/512 10.412</text>
+    <text x="600" y="247" fill="#065f46">10.165</text>
+    <text x="255" y="61" text-anchor="end" fill="#5b21b6">N6/512 13.031</text>
+    <text x="600" y="89" fill="#5b21b6">12.575</text>
+  </g>
+  <text x="428" y="378" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#555">No configuration shows sustained-latency degradation</text>
+</svg>
